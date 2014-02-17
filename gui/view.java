@@ -2,14 +2,48 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
+
+//extending JLabel to provide antialiasing
+class MyJLabel extends JLabel {
+
+    public MyJLabel() {
+        super();
+    }
+
+    public MyJLabel(String label) {
+        super(label);
+    }
+
+    public MyJLabel(String label, int alignment) {
+        super(label, alignment);
+    }
+
+    public MyJLabel(String label, ImageIcon icon, int alignment) {
+        super(label, icon, alignment);
+    }
+
+    // that's the essential part:
+
+    public void paint(Graphics g) {
+        ((Graphics2D) g).setRenderingHint(
+            RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+        );
+        super.paint(g);
+    }
+}
  
 public class View implements ItemListener {
     JPanel cards; //the parent panel, uses CardLayout
     final static String MAINPANEL = "Main View";
     final static String CLOCKPANEL = "Clock View";
     static Font font;
+    int temp;
+    Boolean isRaining;
+
      
     public void addComponentToPane(Container pane) {
+
         //Put the JComboBox in a JPanel to get a nicer look.
         JPanel comboBoxPane = new JPanel(); //use FlowLayout
         String comboBoxItems[] = { MAINPANEL, CLOCKPANEL };
@@ -19,21 +53,28 @@ public class View implements ItemListener {
         comboBoxPane.add(cb);
          
         //Create the "cards".
-        JPanel card1 = new JPanel();
-        card1.setLayout(new BoxLayout(card1, BoxLayout.Y_AXIS));
-        JLabel mainText = new JLabel("<html><center>Well hello there!<br>It's <b>cold and windy</b><br>today at merely<br><br><span style=\"padding:20; font-size:80; font-weight:bold;\">05" + (char)186 + "C</span><br><br>And it's also <b>raining</b>,<br>so don't forget to<br><b>take an umbrella</b>!</center></html>", JLabel.CENTER);
-        mainText.setFont(font);
-        // mainText.setFont(new Font(Font.SANS_SERIF, 0, 30));
-        mainText.setAlignmentX(Component.CENTER_ALIGNMENT);
-        card1.add(mainText);
 
-        JPanel card2 = new JPanel();
-        card2.add(new JTextField("TextField", 20));
+        //the main view
+        JPanel mainViewCard = new JPanel();
+        mainViewCard.setLayout(new BoxLayout(mainViewCard, BoxLayout.Y_AXIS));
+        MyJLabel mainText = new MyJLabel("<html><center style=\"font-size:30;\">Well hello there!<br>It's <b>cold and windy</b><br>today at merely<br><br><span style=\"padding:20; font-size:80; font-weight:bold;\">05" + (char)186 + "C</span><br><br>And it's also <b>raining</b>,<br>so don't forget to<br><b>take an umbrella</b>!</center></html>", JLabel.CENTER);
+        mainText.setFont(new Font("Helvetica Neue", 0, 30));
+        mainText.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mainViewCard.add(mainText);
+
+        //the clock
+        JPanel clockViewCard = new JPanel();
+        clockViewCard.setLayout(new BorderLayout());
+        // clockViewCard.add(new JTextField("TextField", 20), BorderLayout.PAGE_START);
+        MyJLabel clockText = new MyJLabel("<html><center><span style=\"padding:20; font-size:80; font-weight:bold;\">05" + (char)186 + "C</span></center></html>",  JLabel.CENTER);
+        clockText.setFont(new Font("Helvetica Neue", 0, 80));
+        clockViewCard.add(clockText, BorderLayout.CENTER);
+
          
         //Create the panel that contains the "cards".
         cards = new JPanel(new CardLayout());
-        cards.add(card1, MAINPANEL);
-        cards.add(card2, CLOCKPANEL);
+        cards.add(mainViewCard, MAINPANEL);
+        cards.add(clockViewCard, CLOCKPANEL);
          
         pane.add(comboBoxPane, BorderLayout.PAGE_START);
         pane.add(cards, BorderLayout.CENTER);
@@ -66,27 +107,13 @@ public class View implements ItemListener {
     }
      
     public static void main(String[] args) {
-        /* Use an appropriate Look and Feel */
-        try {
-            // UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-        } catch (UnsupportedLookAndFeelException ex) {
-            ex.printStackTrace();
-        } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
-        } catch (InstantiationException ex) {
-            ex.printStackTrace();
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-        }
-        /* Turn off metal's use of bold fonts */
-        UIManager.put("swing.boldMetal", Boolean.FALSE);
 
         Font fontBase = null;
         try {
-            InputStream myStream = new BufferedInputStream(new FileInputStream("CaviarDreams.ttf"));
-            fontBase = Font.createFont(Font.TRUETYPE_FONT, myStream);
-            font = fontBase.deriveFont(Font.PLAIN, 30);
+            InputStream myStream = new BufferedInputStream(new FileInputStream("DISCO.ttf"));
+            fontBase = Font.createFont(Font.TRUETYPE_FONT, new File("DISCO.ttf"));
+            font = fontBase.deriveFont(30);
+            System.out.println("font loaded");
         } catch (Exception ex) {
             ex.printStackTrace();
             System.err.println("font not loaded.");
