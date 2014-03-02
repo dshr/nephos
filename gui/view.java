@@ -33,10 +33,26 @@ class MyJLabel extends JLabel{
         super.paint(g);
     }
 }
+
+class MyJPanel extends JPanel {
+
+    public MyJPanel() {
+        super();
+        setBackground(Color.WHITE);
+    }
+
+    public void paint(Graphics g) {
+        ((Graphics2D) g).setRenderingHint(
+            RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+        );
+        super.paint(g);
+    }
+}
  
 public class View implements ItemListener {
 
-    JPanel cards; //the parent panel, uses CardLayout
+    MyJPanel cards; //the parent panel, uses CardLayout
 
     final static String MAINPANEL = "Main View";
     final static String CLOCKPANEL = "Clock View";
@@ -48,22 +64,22 @@ public class View implements ItemListener {
     static JFrame frame;
     static Boolean isBig;
 
-    static Font font;
+    static Font fontBase;
     int temp;
     Boolean isRaining;
 
-    private static JButton createSimpleButton(String text) { // a method to create flat buttons
+    private static JButton createSimpleButton(String text, int size) { // a method to create flat buttons
         JButton button = new JButton(text);
         button.setForeground(Color.BLACK);
         button.setBackground(Color.WHITE);
         button.setBorderPainted(false);
-        button.setFont(new Font("Helvetica Neue", 0, 50));
+        button.setFont(fontBase.deriveFont(Font.PLAIN, size));
         return button;
     }
 
     private static MyJLabel createLabelWithSize(String text, int size){ // a method to create our labels
         MyJLabel label = new MyJLabel(text, JLabel.CENTER);
-        label.setFont(new Font("Helvetica Neue", 0, size));
+        label.setFont(fontBase.deriveFont(Font.PLAIN, size));
         label.setMaximumSize(label.getPreferredSize());
         return label;
     }
@@ -73,27 +89,36 @@ public class View implements ItemListener {
                     @Override
                     protected void paintComponent(Graphics g) {
                         super.paintComponent(g);
-                        g.setColor(getBackground());
+                        g.setColor(Color.WHITE);
                         g.fillRect(0, 0, getWidth(), getHeight());
                     }
                 };
-        label.setFont(new Font("Helvetica Neue", 0, size));
+        label.setFont(fontBase.deriveFont(Font.PLAIN, size));
         return label;
     }
 
-    private static JCheckBox createCheckBox(String text){ //a method to create our checkboxes
+    private static JCheckBox createCheckBox(String text, int size){ //a method to create our checkboxes
         JCheckBox cb = new JCheckBox(text);
         cb.setForeground(Color.BLACK);
         cb.setBackground(Color.WHITE);
         cb.setBorderPainted(false);
-        cb.setFont(new Font("Helvetica Neue", 0, 50));
+        cb.setFont(fontBase.deriveFont(Font.PLAIN, size));
+        cb.setAlignmentX(Component.CENTER_ALIGNMENT);
         return cb;
+    }
+
+    private static JTextField createTextField(int cols, int size){
+        JTextField tf = new JTextField(cols);
+        tf.setFont(fontBase.deriveFont(Font.PLAIN, size));
+        tf.setAlignmentX(Component.CENTER_ALIGNMENT);
+        tf.setHorizontalAlignment(JTextField.CENTER);
+        return tf;
     }
      
     public void addComponentToPane(Container pane) {
 
-        //Put the JComboBox in a JPanel to get a nicer look.
-        JPanel comboBoxPane = new JPanel(); //use FlowLayout
+        //Put the JComboBox in a MyJPanel to get a nicer look.
+        MyJPanel comboBoxPane = new MyJPanel(); //use FlowLayout
         String comboBoxItems[] = { MAINPANEL, CLOCKPANEL, MAINSETTINGSPANEL, LOCATIONSETTINGSPANEL, ALARMSETTINGSPANEL, SOUNDSETTINGSPANEL };
         JComboBox cb = new JComboBox(comboBoxItems);
         cb.setEditable(false);
@@ -103,7 +128,7 @@ public class View implements ItemListener {
         //===========Create the "cards".==================
 
         //the main view
-        JPanel mainViewCard = new JPanel();
+        MyJPanel mainViewCard = new MyJPanel();
         mainViewCard.setLayout(new BoxLayout(mainViewCard, BoxLayout.Y_AXIS));
         MyJLabel mainText1 = createLabelWithSize(
             "<html>" +
@@ -140,7 +165,7 @@ public class View implements ItemListener {
 
 
         //the clock
-        JPanel clockViewCard = new JPanel();
+        MyJPanel clockViewCard = new MyJPanel();
         clockViewCard.setLayout(new BoxLayout(clockViewCard, BoxLayout.Y_AXIS));
         MyJLabel clockText1 = createTransparentLabelWithSize(
             "<html>" +
@@ -177,49 +202,90 @@ public class View implements ItemListener {
 
 
         //the main settings window
-        JPanel mainSettingsViewCard = new JPanel();
+        MyJPanel mainSettingsViewCard = new MyJPanel();
         mainSettingsViewCard.setLayout(new BoxLayout(mainSettingsViewCard, BoxLayout.Y_AXIS));
-        JButton locationButton = createSimpleButton("Location");
+        JButton locationButton = createSimpleButton("Location", 50);
         locationButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JButton alarmButton = createSimpleButton("Alarm");
+        JButton alarmButton = createSimpleButton("Alarm", 50);
         alarmButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JButton soundButton = createSimpleButton("Sound");
+        JButton soundButton = createSimpleButton("Sound", 50);
         soundButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainSettingsViewCard.add(Box.createVerticalGlue());
-        mainSettingsViewCard.add(locationButton, BorderLayout.CENTER);
+        mainSettingsViewCard.add(locationButton);
         mainSettingsViewCard.add(Box.createVerticalGlue());
-        mainSettingsViewCard.add(alarmButton, BorderLayout.CENTER);
+        mainSettingsViewCard.add(alarmButton);
         mainSettingsViewCard.add(Box.createVerticalGlue());
-        mainSettingsViewCard.add(soundButton, BorderLayout.CENTER);
+        mainSettingsViewCard.add(soundButton);
         mainSettingsViewCard.add(Box.createVerticalGlue());
 
 
         //the location settings window
-        JPanel locationSettingsViewCard = new JPanel();
-        JPanel locationSettingsContents = new JPanel();
-        locationSettingsContents.setLayout(new BoxLayout(locationSettingsContents, BoxLayout.Y_AXIS));
-        JCheckBox automaticEnabled = createCheckBox("Automatic");
-        automaticEnabled.setAlignmentX(Component.CENTER_ALIGNMENT);
-        locationSettingsContents.add(automaticEnabled);
-        locationSettingsViewCard.add(locationSettingsContents, BorderLayout.CENTER);
+        MyJPanel locationSettingsViewCard = new MyJPanel();
+        locationSettingsViewCard.setLayout(new BoxLayout(locationSettingsViewCard, BoxLayout.Y_AXIS));
+
+        JCheckBox automaticEnabled = createCheckBox("Automatic", 50);
+
+        MyJPanel locationInputPanel = new MyJPanel();
+            JTextField locationInput = createTextField(10, 30);
+        locationInputPanel.add(locationInput);
+
+        locationSettingsViewCard.add(Box.createVerticalGlue());
+        locationSettingsViewCard.add(automaticEnabled);
+        locationSettingsViewCard.add(locationInputPanel);
+        locationSettingsViewCard.add(Box.createVerticalGlue());
+        
 
 
-        JPanel alarmSettingsViewCard = new JPanel();
+        MyJPanel alarmSettingsViewCard = new MyJPanel();
+        alarmSettingsViewCard.setLayout(new BoxLayout(alarmSettingsViewCard, BoxLayout.Y_AXIS));
 
+        JCheckBox alarmOn = createCheckBox("On", 50);
 
-        JPanel soundettingsViewCard = new JPanel();
+        MyJPanel timeInputPanel = new MyJPanel();
+            JTextField timeInput = createTextField(10, 30);
+        timeInputPanel.add(timeInput);
 
+        JButton selectSound = createSimpleButton("Select Sound", 50);
+        selectSound.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JCheckBox useColouredObject = createCheckBox("<html><center>Use Coloured Object To Turn Alarm Off</center></html>", 40);
 
+        alarmSettingsViewCard.add(Box.createVerticalGlue());
+        alarmSettingsViewCard.add(alarmOn);
+        alarmSettingsViewCard.add(Box.createVerticalGlue());
+        alarmSettingsViewCard.add(timeInputPanel);
+        alarmSettingsViewCard.add(Box.createVerticalGlue());
+        alarmSettingsViewCard.add(selectSound);
+        alarmSettingsViewCard.add(Box.createVerticalGlue());
+        alarmSettingsViewCard.add(useColouredObject);
+        alarmSettingsViewCard.add(Box.createVerticalGlue());
 
+        MyJPanel soundSettingsViewCard = new MyJPanel();
+        soundSettingsViewCard.setLayout(new BoxLayout(soundSettingsViewCard, BoxLayout.Y_AXIS));
+
+        JCheckBox soundOn = createCheckBox("On", 50);
+        soundOn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        MyJPanel soundLevelPanel = new MyJPanel();
+        // soundLevelPanel.setLayout(new BoxLayout(soundLevelPanel, BoxLayout.Y_AXIS));
+            JSlider soundLevel = new JSlider(JSlider.HORIZONTAL, 0, 100, 75);
+            MyJLabel soundLevelLabel = createLabelWithSize("Volume", 20);
+        soundLevelPanel.add(soundLevelLabel);
+        soundLevelPanel.add(soundLevel);
+
+        soundSettingsViewCard.add(soundOn);
+        soundSettingsViewCard.add(soundLevelPanel);
+        // soundSettingsViewCard.add(soundLevelLabel);
+        soundSettingsViewCard.add(Box.createVerticalGlue());
          
         //Create the panel that contains the "cards".
-        cards = new JPanel(new CardLayout());
+        cards = new MyJPanel();
+        cards.setLayout(new CardLayout());
         cards.add(mainViewCard, MAINPANEL);
         cards.add(clockViewCard, CLOCKPANEL);
         cards.add(mainSettingsViewCard, MAINSETTINGSPANEL);
         cards.add(locationSettingsViewCard, LOCATIONSETTINGSPANEL);
         cards.add(alarmSettingsViewCard, ALARMSETTINGSPANEL);
-        cards.add(soundettingsViewCard, SOUNDSETTINGSPANEL);
+        cards.add(soundSettingsViewCard, SOUNDSETTINGSPANEL);
          
         pane.add(comboBoxPane, BorderLayout.PAGE_START);
         pane.add(cards, BorderLayout.CENTER);
@@ -269,11 +335,12 @@ public class View implements ItemListener {
      
     public static void main(String[] args) {
 
-        Font fontBase = null;
         try {
-            InputStream myStream = new BufferedInputStream(new FileInputStream("DISCO.ttf"));
-            fontBase = Font.createFont(Font.TRUETYPE_FONT, new File("DISCO.ttf"));
-            font = fontBase.deriveFont(30);
+            // InputStream myStream = new BufferedInputStream(new FileInputStream("DISCO.ttf"));
+            fontBase = Font.createFont(Font.TRUETYPE_FONT, new File("Lato-Lig.ttf"));
+            // font = fontBase.deriveFont(Font.PLAIN, 30);
+            GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            genv.registerFont(fontBase);
             System.out.println("font loaded");
         } catch (Exception ex) {
             ex.printStackTrace();
