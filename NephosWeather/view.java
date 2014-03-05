@@ -49,8 +49,8 @@ class MyJPanel extends JPanel {
         super.paint(g);
     }
 }
- 
-public class View implements ItemListener {
+
+class View implements ItemListener {
 
     MyJPanel cards; //the parent panel, uses CardLayout
 
@@ -67,6 +67,20 @@ public class View implements ItemListener {
     static Font fontBase;
     int temp;
     Boolean isRaining;
+
+    public View() {
+        try {
+            // InputStream myStream = new BufferedInputStream(new FileInputStream("DISCO.ttf"));
+            fontBase = Font.createFont(Font.TRUETYPE_FONT, new File("Lato-Lig.ttf"));
+            // font = fontBase.deriveFont(Font.PLAIN, 30);
+            GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            genv.registerFont(fontBase);
+            System.out.println("font loaded");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("font not loaded.");
+        }
+    }
 
     private static JButton createSimpleButton(String text, int size) { // a method to create flat buttons
         JButton button = new JButton(text);
@@ -301,12 +315,12 @@ public class View implements ItemListener {
      * this method should be invoked from the
      * event dispatch thread.
      */
-    private static void createAndShowGUI() {
+    public static void createAndShowGUI() {
         //Create and set up the window.
         frame = new JFrame("Nephos Weather");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(320, 480));
-        frame.setResizable(false);
+        // frame.setResizable(false);
         isBig = false;
         // frame.setUndecorated(true); //<- removes the top bar thing
          
@@ -323,36 +337,19 @@ public class View implements ItemListener {
     {
         if(isBig)
         {
+            frame.setVisible(false);
             frame.setPreferredSize(new Dimension(320, 480));
             isBig = false;
+            frame.pack();
+            frame.setVisible(true);
         }
         else
         {
+            frame.setVisible(false);
             frame.setPreferredSize(new Dimension(1024, 786));
             isBig = true;
+            frame.pack();
+            frame.setVisible(true);
         }
-    }
-     
-    public static void main(String[] args) {
-
-        try {
-            // InputStream myStream = new BufferedInputStream(new FileInputStream("DISCO.ttf"));
-            fontBase = Font.createFont(Font.TRUETYPE_FONT, new File("Lato-Lig.ttf"));
-            // font = fontBase.deriveFont(Font.PLAIN, 30);
-            GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            genv.registerFont(fontBase);
-            System.out.println("font loaded");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.err.println("font not loaded.");
-        }
-         
-        //Schedule a job for the event dispatch thread:
-        //creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
     }
 }
