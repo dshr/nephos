@@ -3,6 +3,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
 import javax.swing.border.*;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 
 //extending JLabel to provide antialiasing
 class MyJLabel extends JLabel{
@@ -56,17 +58,19 @@ class View implements ItemListener {
 
     final static String MAINPANEL = "Main View";
     final static String CLOCKPANEL = "Clock View";
+    final static String CALENDARPANEL = "Calendar View";
     final static String MAINSETTINGSPANEL = "Settings View";
     final static String LOCATIONSETTINGSPANEL = "Location Settings";
     final static String ALARMSETTINGSPANEL = "Alarm Settings";
     final static String SOUNDSETTINGSPANEL = "Sound Settings";
 
     static JFrame frame;
-    static Boolean isBig;
+    static Boolean isBig = false;
 
     static Font fontBase;
     int temp;
     Boolean isRaining;
+    Calendar currentDate;
 
     public View() {
         try {
@@ -80,6 +84,7 @@ class View implements ItemListener {
             ex.printStackTrace();
             System.err.println("font not loaded.");
         }
+        currentDate = Calendar.getInstance();
     }
 
     private static JButton createSimpleButton(String text, int size) { // a method to create flat buttons
@@ -131,9 +136,22 @@ class View implements ItemListener {
      
     public void addComponentToPane(Container pane) {
 
+        //calculate font sizes
+        int smallText = 20;
+        int mediumText = 30;
+        int largeText = 50;
+        int hugeText = 90;
+        if(isBig)
+        {
+            smallText = 40;
+            mediumText = 60;
+            largeText = 100;
+            hugeText = 180;
+        }
+        
         //Put the JComboBox in a MyJPanel to get a nicer look.
-        MyJPanel comboBoxPane = new MyJPanel(); //use FlowLayout
-        String comboBoxItems[] = { MAINPANEL, CLOCKPANEL, MAINSETTINGSPANEL, LOCATIONSETTINGSPANEL, ALARMSETTINGSPANEL, SOUNDSETTINGSPANEL };
+         MyJPanel comboBoxPane = new MyJPanel(); //use FlowLayout
+        String comboBoxItems[] = { MAINPANEL, CLOCKPANEL, CALENDARPANEL, MAINSETTINGSPANEL, LOCATIONSETTINGSPANEL, ALARMSETTINGSPANEL, SOUNDSETTINGSPANEL };
         JComboBox cb = new JComboBox(comboBoxItems);
         cb.setEditable(false);
         cb.addItemListener(this);
@@ -151,13 +169,13 @@ class View implements ItemListener {
                     "It's <b>cold and windy</b><br>" + 
                     "today at merely" + 
                 "</center>"+ 
-            "</html>", 30);
+            "</html>", mediumText);
         MyJLabel mainText2 = createLabelWithSize(
             "<html>" +
                 "<center>" + 
                     "<span style=\"font-weight:bold;\">05" + (char)186 + "C</span>" +
                 "</center>"+ 
-            "</html>", 90);
+            "</html>", hugeText);
         MyJLabel mainText3 = createLabelWithSize(
             "<html>" +
                 "<center>" + 
@@ -165,7 +183,7 @@ class View implements ItemListener {
                     "so don't forget to<br>" + 
                     "<b>take an umbrella</b>!" + 
                 "</center>"+ 
-            "</html>", 30);
+            "</html>", mediumText);
         mainViewCard.add(Box.createVerticalGlue());
         mainText1.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainViewCard.add(mainText1);
@@ -188,13 +206,13 @@ class View implements ItemListener {
                     "It's <b>cold and windy</b><br>" + 
                     "today at merely" + 
                 "</center>"+ 
-            "</html>", 30);
+            "</html>", mediumText);
         MyJLabel clockText2 = createLabelWithSize(
             "<html>" +
                 "<center>" + 
                     "<span style=\"font-weight:bold;\">05" + (char)186 + "C</span>" +
                 "</center>"+ 
-            "</html>", 90);
+            "</html>", hugeText);
         MyJLabel clockText3 = createTransparentLabelWithSize(
             "<html>" +
                 "<center>" + 
@@ -202,7 +220,7 @@ class View implements ItemListener {
                     "so don't forget to<br>" + 
                     "<b>take an umbrella</b>!" + 
                 "</center>"+ 
-            "</html>", 30);
+            "</html>", mediumText);
         clockViewCard.add(Box.createVerticalGlue());
         clockText1.setAlignmentX(Component.CENTER_ALIGNMENT);
         clockViewCard.add(clockText1);
@@ -214,15 +232,51 @@ class View implements ItemListener {
         clockViewCard.add(clockText3);
         clockViewCard.add(Box.createVerticalGlue());
 
+        // the calendar
+        MyJPanel calendarViewCard = new MyJPanel();
+        calendarViewCard.setLayout(new BoxLayout(calendarViewCard, BoxLayout.Y_AXIS));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
+        SimpleDateFormat dayOfTheWeek = new SimpleDateFormat("EEE");
+        if(isBig)
+        {
+            dayOfTheWeek = new SimpleDateFormat("EEEE");
+        }
+        MyJLabel today = createLabelWithSize("Today   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        today.setAlignmentX(Component.CENTER_ALIGNMENT);
+        currentDate.add(Calendar.DATE, 1);
+        MyJLabel tomorrow = createLabelWithSize("Tomorrow   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        tomorrow.setAlignmentX(Component.CENTER_ALIGNMENT);
+        currentDate.add(Calendar.DATE, 1);
+        MyJLabel day3 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        day3.setAlignmentX(Component.CENTER_ALIGNMENT);
+        currentDate.add(Calendar.DATE, 1);
+        MyJLabel day4 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        day4.setAlignmentX(Component.CENTER_ALIGNMENT);
+        currentDate.add(Calendar.DATE, 1);
+        MyJLabel day5 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        day5.setAlignmentX(Component.CENTER_ALIGNMENT);
+        currentDate.add(Calendar.DATE, 1);
+        MyJLabel day6 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        day6.setAlignmentX(Component.CENTER_ALIGNMENT);
+        currentDate.add(Calendar.DATE, 1);
+        MyJLabel day7 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        day7.setAlignmentX(Component.CENTER_ALIGNMENT);
+        calendarViewCard.add(today);
+        calendarViewCard.add(tomorrow);
+        calendarViewCard.add(day3);
+        calendarViewCard.add(day4);
+        calendarViewCard.add(day5);
+        calendarViewCard.add(day6);
+        calendarViewCard.add(day7);
 
         //the main settings window
         MyJPanel mainSettingsViewCard = new MyJPanel();
         mainSettingsViewCard.setLayout(new BoxLayout(mainSettingsViewCard, BoxLayout.Y_AXIS));
-        JButton locationButton = createSimpleButton("Location", 50);
+        JButton locationButton = createSimpleButton("Location", largeText);
         locationButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JButton alarmButton = createSimpleButton("Alarm", 50);
+        JButton alarmButton = createSimpleButton("Alarm", largeText);
         alarmButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JButton soundButton = createSimpleButton("Sound", 50);
+        JButton soundButton = createSimpleButton("Sound", largeText);
         soundButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainSettingsViewCard.add(Box.createVerticalGlue());
         mainSettingsViewCard.add(locationButton);
@@ -237,10 +291,10 @@ class View implements ItemListener {
         MyJPanel locationSettingsViewCard = new MyJPanel();
         locationSettingsViewCard.setLayout(new BoxLayout(locationSettingsViewCard, BoxLayout.Y_AXIS));
 
-        JCheckBox automaticEnabled = createCheckBox("Automatic", 50);
+        JCheckBox automaticEnabled = createCheckBox("Automatic", largeText);
 
         MyJPanel locationInputPanel = new MyJPanel();
-            JTextField locationInput = createTextField(10, 30);
+            JTextField locationInput = createTextField(10, mediumText);
         locationInputPanel.add(locationInput);
 
         locationSettingsViewCard.add(Box.createVerticalGlue());
@@ -253,13 +307,13 @@ class View implements ItemListener {
         MyJPanel alarmSettingsViewCard = new MyJPanel();
         alarmSettingsViewCard.setLayout(new BoxLayout(alarmSettingsViewCard, BoxLayout.Y_AXIS));
 
-        JCheckBox alarmOn = createCheckBox("On", 50);
+        JCheckBox alarmOn = createCheckBox("On", largeText);
 
         MyJPanel timeInputPanel = new MyJPanel();
-            JTextField timeInput = createTextField(10, 30);
+            JTextField timeInput = createTextField(10, mediumText);
         timeInputPanel.add(timeInput);
 
-        JButton selectSound = createSimpleButton("Select Sound", 50);
+        JButton selectSound = createSimpleButton("Select Sound", largeText);
         selectSound.setAlignmentX(Component.CENTER_ALIGNMENT);
         JCheckBox useColouredObject = createCheckBox("<html><center>Use Coloured Object To Turn Alarm Off</center></html>", 40);
 
@@ -276,13 +330,13 @@ class View implements ItemListener {
         MyJPanel soundSettingsViewCard = new MyJPanel();
         soundSettingsViewCard.setLayout(new BoxLayout(soundSettingsViewCard, BoxLayout.Y_AXIS));
 
-        JCheckBox soundOn = createCheckBox("On", 50);
+        JCheckBox soundOn = createCheckBox("On", largeText);
         soundOn.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         MyJPanel soundLevelPanel = new MyJPanel();
         // soundLevelPanel.setLayout(new BoxLayout(soundLevelPanel, BoxLayout.Y_AXIS));
             JSlider soundLevel = new JSlider(JSlider.HORIZONTAL, 0, 100, 75);
-            MyJLabel soundLevelLabel = createLabelWithSize("Volume", 20);
+            MyJLabel soundLevelLabel = createLabelWithSize("Volume", smallText);
         soundLevelPanel.add(soundLevelLabel);
         soundLevelPanel.add(soundLevel);
 
@@ -296,6 +350,7 @@ class View implements ItemListener {
         cards.setLayout(new CardLayout());
         cards.add(mainViewCard, MAINPANEL);
         cards.add(clockViewCard, CLOCKPANEL);
+        cards.add(calendarViewCard, CALENDARPANEL);
         cards.add(mainSettingsViewCard, MAINSETTINGSPANEL);
         cards.add(locationSettingsViewCard, LOCATIONSETTINGSPANEL);
         cards.add(alarmSettingsViewCard, ALARMSETTINGSPANEL);
@@ -319,9 +374,15 @@ class View implements ItemListener {
         //Create and set up the window.
         frame = new JFrame("Nephos Weather");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setPreferredSize(new Dimension(320, 480));
-        // frame.setResizable(false);
-        isBig = false;
+        if(isBig)
+        {
+            frame.setPreferredSize(new Dimension(1024, 786));
+        }
+        else
+        {
+            frame.setPreferredSize(new Dimension(320, 480));
+        }
+        frame.setResizable(false);
         // frame.setUndecorated(true); //<- removes the top bar thing
          
         //Create and set up the content pane.
@@ -337,19 +398,13 @@ class View implements ItemListener {
     {
         if(isBig)
         {
-            frame.setVisible(false);
-            frame.setPreferredSize(new Dimension(320, 480));
             isBig = false;
-            frame.pack();
-            frame.setVisible(true);
+            createAndShowGUI();
         }
         else
         {
-            frame.setVisible(false);
-            frame.setPreferredSize(new Dimension(1024, 786));
             isBig = true;
-            frame.pack();
-            frame.setVisible(true);
+            createAndShowGUI();
         }
     }
 }
