@@ -1,0 +1,46 @@
+class MyDrawingPanel extends JPanel {
+
+    static Dimension panelSize;
+    static int circleSize;
+
+    public MyDrawingPanel(Dimension size) {
+        super();
+        panelSize = size;
+        System.out.println("" + size.width + " " + size.height);
+        if(size.width > size.height)
+        {
+            circleSize = size.height;
+        }
+        else
+        {
+            circleSize = size.width;
+        }
+        System.out.println(circleSize);
+        setBackground(Color.WHITE);
+    }
+
+    public void paintChildren(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        super.paintChildren(g);
+        Ellipse2D circle = new Ellipse2D.Double(panelSize.width/2-(circleSize/2), panelSize.height/2-(circleSize/2), circleSize, circleSize);
+        g2.setColor(new Color(0.0f,0.0f,0.0f, 1.0f));
+        g2.setStroke(new BasicStroke(5f));
+        g2.draw(circle);
+    }
+
+    public void setDrawingSize(Dimension size) {
+        panelSize = size;
+        System.out.println("" + size.width + " " + size.height);
+        if(size.width > size.height)
+        {
+            circleSize = size.height;
+        }
+        else
+        {
+            circleSize = size.width;
+        }
+        System.out.println(circleSize);
+        setBackground(Color.WHITE);
+    }
+}

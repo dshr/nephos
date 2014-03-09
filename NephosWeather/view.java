@@ -5,6 +5,7 @@ import java.io.*;
 import javax.swing.border.*;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
+import java.awt.geom.Ellipse2D;
 
 //extending JLabel to provide antialiasing
 class MyJLabel extends JLabel{
@@ -28,10 +29,7 @@ class MyJLabel extends JLabel{
     // that's the essential part:
 
     public void paint(Graphics g) {
-        ((Graphics2D) g).setRenderingHint(
-            RenderingHints.KEY_TEXT_ANTIALIASING,
-            RenderingHints.VALUE_TEXT_ANTIALIAS_ON
-        );
+        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         super.paint(g);
     }
 }
@@ -44,17 +42,15 @@ class MyJPanel extends JPanel {
     }
 
     public void paint(Graphics g) {
-        ((Graphics2D) g).setRenderingHint(
-            RenderingHints.KEY_TEXT_ANTIALIASING,
-            RenderingHints.VALUE_TEXT_ANTIALIAS_ON
-        );
+        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         super.paint(g);
     }
 }
 
-class View implements ItemListener {
 
-    MyJPanel cards; //the parent panel, uses CardLayout
+class View {
+
+    static MyJPanel cards; //the parent panel, uses CardLayout
 
     final static String MAINPANEL = "Main View";
     final static String CLOCKPANEL = "Clock View";
@@ -70,7 +66,7 @@ class View implements ItemListener {
     static Font fontBase;
     int temp;
     Boolean isRaining;
-    Calendar currentDate;
+    static Calendar currentDate;
 
     public View() {
         try {
@@ -107,12 +103,16 @@ class View implements ItemListener {
         MyJLabel label = new MyJLabel(text, JLabel.CENTER){
                     @Override
                     protected void paintComponent(Graphics g) {
+                        // g.setColor(new Color(0.0f,0.0f,0.0f, 0.0f));
                         super.paintComponent(g);
                         g.setColor(Color.WHITE);
                         g.fillRect(0, 0, getWidth(), getHeight());
                     }
                 };
+        label.setForeground(new Color(0.0f,0.0f,0.0f,0.0f));
         label.setFont(fontBase.deriveFont(Font.PLAIN, size));
+        label.setOpaque(false);
+        
         return label;
     }
 
@@ -134,7 +134,7 @@ class View implements ItemListener {
         return tf;
     }
      
-    public void addComponentToPane(Container pane) {
+    public static void addComponentToPane(Container pane) {
 
         //calculate font sizes
         int smallText = 20;
@@ -150,11 +150,17 @@ class View implements ItemListener {
         }
         
         //Put the JComboBox in a MyJPanel to get a nicer look.
-         MyJPanel comboBoxPane = new MyJPanel(); //use FlowLayout
+        MyJPanel comboBoxPane = new MyJPanel(); //use FlowLayout
         String comboBoxItems[] = { MAINPANEL, CLOCKPANEL, CALENDARPANEL, MAINSETTINGSPANEL, LOCATIONSETTINGSPANEL, ALARMSETTINGSPANEL, SOUNDSETTINGSPANEL };
         JComboBox cb = new JComboBox(comboBoxItems);
         cb.setEditable(false);
-        cb.addItemListener(this);
+        cb.addItemListener(
+            new ItemListener(){
+                public void itemStateChanged(ItemEvent evt) {
+                    CardLayout cl = (CardLayout)(cards.getLayout());
+                    cl.show(cards, (String)evt.getItem());
+                }
+            });
         comboBoxPane.add(cb);
          
         //===========Create the "cards".==================
@@ -197,11 +203,12 @@ class View implements ItemListener {
 
 
         //the clock
-        MyJPanel clockViewCard = new MyJPanel();
+        MyDrawingPanel clockViewCard = new MyDrawingPanel(new Dimension(320, 420));
+        if(isBig) clockViewCard = new MyDrawingPanel(new Dimension(1024, 726));
         clockViewCard.setLayout(new BoxLayout(clockViewCard, BoxLayout.Y_AXIS));
         MyJLabel clockText1 = createTransparentLabelWithSize(
             "<html>" +
-                "<center>" + 
+                "<center style=\"font-color: rgba(255,0,0,0.3);\">" + 
                     "Well hello there!<br>" + 
                     "It's <b>cold and windy</b><br>" + 
                     "today at merely" + 
@@ -215,7 +222,7 @@ class View implements ItemListener {
             "</html>", hugeText);
         MyJLabel clockText3 = createTransparentLabelWithSize(
             "<html>" +
-                "<center>" + 
+                "<center style=\"font-color: rgba(255,0,0,0.3);\">" + 
                     "And it's also <b>raining</b>,<br>" + 
                     "so don't forget to<br>" + 
                     "<b>take an umbrella</b>!" + 
@@ -231,6 +238,7 @@ class View implements ItemListener {
         clockText3.setAlignmentX(Component.CENTER_ALIGNMENT);
         clockViewCard.add(clockText3);
         clockViewCard.add(Box.createVerticalGlue());
+        
 
         // the calendar
         MyJPanel calendarViewCard = new MyJPanel();
@@ -360,10 +368,10 @@ class View implements ItemListener {
         pane.add(cards, BorderLayout.CENTER);
     }
      
-    public void itemStateChanged(ItemEvent evt) {
-        CardLayout cl = (CardLayout)(cards.getLayout());
-        cl.show(cards, (String)evt.getItem());
-    }
+    // public void itemStateChanged(ItemEvent evt) {
+    //     CardLayout cl = (CardLayout)(cards.getLayout());
+    //     cl.show(cards, (String)evt.getItem());
+    // }
      
     /**
      * Create the GUI and show it.  For thread safety,
@@ -386,8 +394,9 @@ class View implements ItemListener {
         // frame.setUndecorated(true); //<- removes the top bar thing
          
         //Create and set up the content pane.
-        View demo = new View();
-        demo.addComponentToPane(frame.getContentPane());
+        // View demo = new View();
+        // demo.
+        addComponentToPane(frame.getContentPane());
          
         //Display the window.
         frame.pack();
@@ -396,6 +405,8 @@ class View implements ItemListener {
 
     public static void changeSize()
     {
+        frame.setVisible(false);
+        frame.dispose();
         if(isBig)
         {
             isBig = false;

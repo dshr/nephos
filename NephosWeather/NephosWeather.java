@@ -7,7 +7,7 @@ public class NephosWeather{
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 mainGUI.createAndShowGUI();
-                // mainGUI.changeSize();
+                mainGUI.changeSize();
             }
         });
     }
