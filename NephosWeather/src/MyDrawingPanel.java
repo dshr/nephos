@@ -1,3 +1,5 @@
+// package nephos;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -8,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.awt.geom.Ellipse2D;
 import javax.vecmath.Vector2d;
 
-class MyDrawingPanel extends JPanel implements MouseMotionListener {
+public class MyDrawingPanel extends JPanel implements MouseMotionListener {
 
     static Dimension panelSize;
     static int circleSize;
@@ -22,7 +24,7 @@ class MyDrawingPanel extends JPanel implements MouseMotionListener {
         super();
         setFocusable(true);
         panelSize = size;
-        System.out.println("" + size.width + " " + size.height);
+        // System.out.println("" + size.width + " " + size.height);
         if(size.width > size.height)
         {
             circleSize = (int)(0.8 * size.height);
@@ -31,7 +33,7 @@ class MyDrawingPanel extends JPanel implements MouseMotionListener {
         {
             circleSize = (int)(0.8 * size.width);
         }
-        System.out.println(circleSize);
+        // System.out.println(circleSize);
         setBackground(Color.WHITE);
         currentTime = Calendar.getInstance();
         displayedTime = Calendar.getInstance();
@@ -82,7 +84,7 @@ class MyDrawingPanel extends JPanel implements MouseMotionListener {
     }
 
     public void mouseMoved(MouseEvent e) {
-        System.out.println("Dragged");
+        // System.out.println("Dragged");
     }
 
     public void mouseDragged(MouseEvent e){ 

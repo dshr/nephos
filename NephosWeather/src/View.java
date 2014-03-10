@@ -1,3 +1,5 @@
+
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -46,7 +48,7 @@ class MyJPanel extends JPanel {
 }
 
 
-class View {
+public class View {
 
     static MyJPanel cards; //the parent panel, uses CardLayout
 
@@ -71,7 +73,7 @@ class View {
     public View() {
         try {
             // InputStream myStream = new BufferedInputStream(new FileInputStream("DISCO.ttf"));
-            fontBase = Font.createFont(Font.TRUETYPE_FONT, new File("Lato-Lig.ttf"));
+            fontBase = Font.createFont(Font.TRUETYPE_FONT, new File("resources/Lato-Lig.ttf"));
             // font = fontBase.deriveFont(Font.PLAIN, 30);
             GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment();
             genv.registerFont(fontBase);
@@ -167,14 +169,14 @@ class View {
             hugeText = 180;
         }
         //load up icons
-        ImageIcon cal = createImageIcon("images/calendar_32.png", "small cal");
-        ImageIcon settings = createImageIcon("images/cog_32.png", "small cog");
-        ImageIcon arrow = createImageIcon("images/arrow_32.png", "small arrow");
+        ImageIcon cal = createImageIcon("resources/images/calendar_32.png", "small cal");
+        ImageIcon settings = createImageIcon("resources/images/cog_32.png", "small cog");
+        ImageIcon arrow = createImageIcon("resources/images/arrow_32.png", "small arrow");
         if(isBig)
         {
-            cal = createImageIcon("images/calendar_64.png", "big cal");
-            settings = createImageIcon("images/cog_64.png", "big cog");
-            arrow = createImageIcon("images/arrow_64.png", "big arrow");
+            cal = createImageIcon("resources/images/calendar_64.png", "big cal");
+            settings = createImageIcon("resources/images/cog_64.png", "big cog");
+            arrow = createImageIcon("resources/images/arrow_64.png", "big arrow");
         }
          
         //===========Create the "cards".==================
