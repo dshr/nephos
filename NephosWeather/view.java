@@ -181,6 +181,13 @@ class View {
 
         //the main view
         MyJPanel mainViewCard = new MyJPanel();
+        mainViewCard.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e){
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards, CLOCKPANEL);
+                clockViewCard.mouseDragged(e);
+            }
+        });
         mainViewCard.setLayout(new BoxLayout(mainViewCard, BoxLayout.Y_AXIS));
         MyJPanel mainViewCardNavigation = new MyJPanel();
             mainViewCardNavigation.setLayout(new BoxLayout(mainViewCardNavigation, BoxLayout.X_AXIS));
@@ -241,6 +248,12 @@ class View {
         //the clock
         clockViewCard = new MyDrawingPanel(new Dimension(320, 420));
         if(isBig) clockViewCard = new MyDrawingPanel(new Dimension(1024, 726));
+        clockViewCard.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e){
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards, MAINPANEL);
+            }
+        });
         clockViewCard.setLayout(new BoxLayout(clockViewCard, BoxLayout.Y_AXIS));
         MyJLabel clockText1 = createTransparentLabelWithSize(
             "<html>" +
