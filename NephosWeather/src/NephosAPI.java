@@ -135,4 +135,8 @@ public class NephosAPI{
 		return Double.parseDouble(weekConditions.getDay(day).getByKey("precipIntensity"));
 	}
 
+	public int getTemperatureAtDay(int day){
+		return (int)((Double.parseDouble(weekConditions.getDay(day).getByKey("temperatureMin")))+(Double.parseDouble(weekConditions.getDay(day).getByKey("temperatureMax"))))/2;
+	}
+
 }

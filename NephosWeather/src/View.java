@@ -45,8 +45,28 @@ class MyJPanel extends JPanel {
     }
 }
 
-
 public class View {
+
+    private class MyDispatcher implements KeyEventDispatcher {
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent e) {
+            if (e.getID() == KeyEvent.KEY_PRESSED) {
+                System.out.println(e.getKeyCode());
+                if(e.getKeyCode() == 32)
+                {
+                    System.out.println("bop!");
+                    System.out.println(isBig);
+                    changeSize();
+                }
+                return true;
+            } else if (e.getID() == KeyEvent.KEY_RELEASED) {
+                return true;
+            } else if (e.getID() == KeyEvent.KEY_TYPED) {
+                return true;
+            }
+            return false;
+        }
+    }
 
     static MyJPanel cards; //the parent panel, uses CardLayout
 
@@ -59,7 +79,7 @@ public class View {
     final static String SOUNDSETTINGSPANEL = "Sound Settings";
 
     static JFrame frame;
-    static Boolean isBig = false;
+    static Boolean isBig;
 
     static Font fontBase;
     int temp;
@@ -84,6 +104,20 @@ public class View {
         }
         currentDate = Calendar.getInstance();
         weather = w;
+        isBig = false;
+        System.out.println(isBig);
+    }
+
+    private static String getTempAtDay(int day)
+    {
+        if(isBig)
+        {
+            return "min: " + weather.getMinTemperatureAtDay(day) + (char)186 + "C " + " max: " + weather.getMaxTemperatureAtDay(day);
+        }
+        else
+        {
+            return "" + weather.getTemperatureAtDay(day);
+        }
     }
 
     private static JButton createSimpleButton(String text, int size) { // a method to create flat buttons
@@ -146,14 +180,14 @@ public class View {
     }
 
     private ImageIcon createImageIcon(String path, String description) {
-    java.net.URL imgURL = getClass().getResource(path);
-    if (imgURL != null) {
-        return new ImageIcon(imgURL, description);
-    } else {
-        System.err.println("Couldn't find file: " + path);
-        return null;
+        java.net.URL imgURL = getClass().getResource(path);
+        if (imgURL != null) {
+            return new ImageIcon(imgURL, description);
+        } else {
+            System.err.println("Couldn't find file: " + path);
+            return null;
+        }
     }
-}
      
     public void addComponentToPane(Container pane) {
 
@@ -324,26 +358,27 @@ public class View {
         {
             dayOfTheWeek = new SimpleDateFormat("EEEE");
         }
-        MyJLabel today = createLabelWithSize("Today   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        MyJLabel today = createLabelWithSize("Today   " + dateFormat.format(currentDate.getTime()) + "   " + getTempAtDay(0) + (char)186 + "C", mediumText);
         today.setAlignmentX(Component.CENTER_ALIGNMENT);
         currentDate.add(Calendar.DATE, 1);
-        MyJLabel tomorrow = createLabelWithSize("Tomorrow   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        MyJLabel tomorrow = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   " + getTempAtDay(1) + (char)186 + "C", mediumText);
         tomorrow.setAlignmentX(Component.CENTER_ALIGNMENT);
         currentDate.add(Calendar.DATE, 1);
-        MyJLabel day3 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        MyJLabel day3 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   " + getTempAtDay(2) + (char)186 + "C", mediumText);
         day3.setAlignmentX(Component.CENTER_ALIGNMENT);
         currentDate.add(Calendar.DATE, 1);
-        MyJLabel day4 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        MyJLabel day4 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   " + getTempAtDay(3) + (char)186 + "C", mediumText);
         day4.setAlignmentX(Component.CENTER_ALIGNMENT);
         currentDate.add(Calendar.DATE, 1);
-        MyJLabel day5 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        MyJLabel day5 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   " + getTempAtDay(4) + (char)186 + "C", mediumText);
         day5.setAlignmentX(Component.CENTER_ALIGNMENT);
         currentDate.add(Calendar.DATE, 1);
-        MyJLabel day6 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        MyJLabel day6 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   " + getTempAtDay(5) + (char)186 + "C", mediumText);
         day6.setAlignmentX(Component.CENTER_ALIGNMENT);
         currentDate.add(Calendar.DATE, 1);
-        MyJLabel day7 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   05" + (char)186 + "C", mediumText);
+        MyJLabel day7 = createLabelWithSize(dayOfTheWeek.format(currentDate.getTime()) + "   " + dateFormat.format(currentDate.getTime()) + "   " + getTempAtDay(6) + (char)186 + "C", mediumText);
         day7.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         calendarViewCard.add(calendarViewCardNavigation);
         calendarViewCard.add(Box.createVerticalGlue());
         calendarViewCard.add(today);
@@ -526,6 +561,7 @@ public class View {
         //Create and set up the window.
         frame = new JFrame("Nephos Weather");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        System.out.println(isBig);
         if(isBig)
         {
             frame.setPreferredSize(new Dimension(1024, 786));
@@ -541,7 +577,10 @@ public class View {
         // View demo = new View();
         // demo.
         addComponentToPane(frame.getContentPane());
-         
+        
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher(new MyDispatcher());
+
         //Display the window.
         frame.pack();
         frame.setVisible(true);
