@@ -1,5 +1,3 @@
-
-
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -70,7 +68,9 @@ public class View {
 
     static MyDrawingPanel clockViewCard;
 
-    public View() {
+    static NephosAPI weather;
+
+    public View(NephosAPI w) {
         try {
             // InputStream myStream = new BufferedInputStream(new FileInputStream("DISCO.ttf"));
             fontBase = Font.createFont(Font.TRUETYPE_FONT, new File("resources/Lato-Lig.ttf"));
@@ -83,6 +83,7 @@ public class View {
             System.err.println("font not loaded.");
         }
         currentDate = Calendar.getInstance();
+        weather = w;
     }
 
     private static JButton createSimpleButton(String text, int size) { // a method to create flat buttons
@@ -197,6 +198,7 @@ public class View {
                 calendarButton.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
                         CardLayout cl = (CardLayout)(cards.getLayout());
+                        // calendarViewCard.displayedTime = Calendar.getInstance();
                         cl.show(cards, CALENDARPANEL);
                     }
                 });
@@ -222,7 +224,7 @@ public class View {
         MyJLabel mainText2 = createLabelWithSize(
             "<html>" +
                 "<center>" + 
-                    "<span style=\"font-weight:bold;\">05" + (char)186 + "C</span>" +
+                    "<span style=\"font-weight:bold;\">" + weather.getCurrentTemperature() + (char)186 + "C</span>" +
                 "</center>"+ 
             "</html>", hugeText);
         MyJLabel mainText3 = createLabelWithSize(
@@ -234,7 +236,6 @@ public class View {
                 "</center>"+ 
             "</html>", mediumText);
         mainViewCard.add(mainViewCardNavigation);
-        mainViewCard.add(Box.createRigidArea(new Dimension(0,1)));
         mainViewCard.add(Box.createVerticalGlue());
         mainText1.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainViewCard.add(mainText1);
@@ -257,6 +258,8 @@ public class View {
             }
         });
         clockViewCard.setLayout(new BoxLayout(clockViewCard, BoxLayout.Y_AXIS));
+        SimpleDateFormat timeFormat = new SimpleDateFormat("EEEE dd/MM hh:mm");
+        MyJLabel timeText = createLabelWithSize(timeFormat.format(clockViewCard.displayedTime.getTime()), mediumText);
         MyJLabel clockText1 = createTransparentLabelWithSize(
             "<html>" +
                 "<center style=\"font-color: rgba(255,0,0,0.3);\">" + 
@@ -268,7 +271,7 @@ public class View {
         MyJLabel clockText2 = createLabelWithSize(
             "<html>" +
                 "<center>" + 
-                    "<span style=\"font-weight:bold;\">05" + (char)186 + "C</span>" +
+                    "<span style=\"font-weight:bold;\">" + weather.getCurrentTemperature() + (char)186 + "C</span>" +
                 "</center>"+ 
             "</html>", hugeText);
         MyJLabel clockText3 = createTransparentLabelWithSize(
@@ -279,6 +282,9 @@ public class View {
                     "<b>take an umbrella</b>!" + 
                 "</center>"+ 
             "</html>", mediumText);
+        clockViewCard.add(Box.createVerticalGlue());
+        timeText.setAlignmentX(Component.CENTER_ALIGNMENT);
+        clockViewCard.add(timeText);
         clockViewCard.add(Box.createVerticalGlue());
         clockText1.setAlignmentX(Component.CENTER_ALIGNMENT);
         clockViewCard.add(clockText1);

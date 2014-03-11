@@ -21,7 +21,7 @@ public class NephosAPI{
 	private static FIODaily weekConditions;
 	
 
-	public static void NephosAPI() {
+	public NephosAPI() {
 
 		String apikey = "7574e01b3ae61840c3751468897c932d";
 		String longitude = "51.5085300";
@@ -42,7 +42,6 @@ public class NephosAPI{
 		currentCloudCover = Double.parseDouble(currentConditions.get().getByKey("cloudCover"));
 		currentWindSpeed = Double.parseDouble(currentConditions.get().getByKey("windSpeed"));
 		currentHumidity = Double.parseDouble(currentConditions.get().getByKey("humidity"));
-
 
 		hoursConditions = new FIOHourly(nephosForecast);
 		weekConditions = new FIODaily(nephosForecast);
