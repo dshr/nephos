@@ -10,7 +10,8 @@ import java.text.SimpleDateFormat;
 import java.awt.geom.Ellipse2D;
 import javax.vecmath.Vector2d;
 
-public class MyDrawingPanel extends JPanel implements MouseMotionListener {
+
+public class MyDrawingPanel extends JPanel implements MouseMotionListener{
 
     static Dimension panelSize;
     static int circleSize;
@@ -85,6 +86,7 @@ public class MyDrawingPanel extends JPanel implements MouseMotionListener {
         center = new Point(panelSize.width/2, centerPointHeight);
         fontBase = f;
         textSize = _textSize;
+		View.isClock = true;
     }
 
     public void paintChildren(Graphics g) {
@@ -139,10 +141,9 @@ public class MyDrawingPanel extends JPanel implements MouseMotionListener {
     }
 
     public void mouseMoved(MouseEvent e) {
-        // System.out.println("Dragged");
     }
 
-    public void mouseDragged(MouseEvent e){ 
+    public void mouseDragged(MouseEvent e){
         Point current = e.getPoint();
         if(last == null)
         {
@@ -186,3 +187,4 @@ public class MyDrawingPanel extends JPanel implements MouseMotionListener {
         }
     }
 }
+

@@ -7,6 +7,19 @@ import java.util.Calendar;
 import java.text.SimpleDateFormat;
 import java.awt.geom.Ellipse2D;
 
+import static com.googlecode.javacv.cpp.opencv_core.*;
+import static com.googlecode.javacv.cpp.opencv_imgproc.*;
+import static com.googlecode.javacv.cpp.opencv_highgui.*;
+
+import com.googlecode.javacv.OpenCVFrameGrabber;
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+import static com.googlecode.javacv.cpp.opencv_core.cvFlip;
+
+import com.googlecode.javacpp.Loader;
+import static com.googlecode.javacpp.Loader.*;
+
+import java.awt.Dimension;
+
 //extending JLabel to provide antialiasing
 class MyJLabel extends JLabel{
 
@@ -58,6 +71,12 @@ public class View {
                     System.out.println(isBig);
                     changeSize();
                 }
+
+				else if((e.getKeyCode() == 39));
+				{	
+					rightPressed = true;
+					checkCard();
+				}
                 return true;
             } else if (e.getID() == KeyEvent.KEY_RELEASED) {
                 return true;
@@ -70,6 +89,11 @@ public class View {
 
     static MyJPanel cards; //the parent panel, uses CardLayout
     static MyDrawingPanel clockViewCard;
+    
+	static int hueLowerR = 140;
+	static int hueUpperR = 200;
+	static Robot bot;
+
 
     final static String MAINPANEL = "Main View";
     final static String CLOCKPANEL = "Clock View";
@@ -81,6 +105,8 @@ public class View {
 
     static JFrame frame;
     static Boolean isBig;
+	static Boolean rightPressed = false;
+	static Boolean isClock = false;
 
     static Font fontBase;
     int temp;
@@ -88,6 +114,8 @@ public class View {
     static Calendar currentDate;
 
     static NephosAPI weather;
+	
+	static int count = 1;
 
     public View(NephosAPI w) {
         try {
@@ -228,6 +256,7 @@ public class View {
                 clockViewCard.last = null;
                 cl.show(cards, CLOCKPANEL);
                 clockViewCard.mouseDragged(e);
+				isClock = true;
             }
         });
         mainViewCard.setLayout(new BoxLayout(mainViewCard, BoxLayout.Y_AXIS));
@@ -315,6 +344,7 @@ public class View {
             public void mouseClicked(MouseEvent e){
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards, MAINPANEL);
+				isClock = false;
             }
         });
         clockViewCard.setLayout(new BoxLayout(clockViewCard, BoxLayout.Y_AXIS));
@@ -604,4 +634,136 @@ public class View {
             createAndShowGUI();
         }
     }
+	
+	public void checkCard() {
+		if(isClock) 
+		{
+			try {
+				move();
+			}
+		
+			catch (Exception ex)
+			{
+				System.out.println("Error");
+			}
+		}
+	}
+	public void move() throws Exception {
+			
+			rightPressed = false;
+			View.count++;
+			int timer = 100;
+			int result = 0;
+			int divider = 0;
+
+			System.out.println("Dragged method running");
+			OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(0);
+        	grabber.start();
+			//Create canvas frame for displaying webcam.
+			//CanvasFrame canvasW = new CanvasFrame("Webcam");
+       
+			//Set Canvas frame to close on exit
+
+			IplImage orgImg = grabber.grab();
+		  	//Set canvas size as per dimentions of video frame.
+		 	//canvasW.setCanvasSize(grabber.getImageWidth(), grabber.getImageHeight());
+		  	// threshold the captured image using the lower and upper thresholds
+		  	// defined above
+                //  see end of the code for explanation on contours                          		        
+        
+			outerloop:
+			while ((orgImg = grabber.grab()) != null) {
+				timer --;
+				if(timer == 0) {
+					break outerloop;
+				}
+			  // threshold the captured image using the lower and upper thresholds
+			  	IplImage thresholdImage = hsvThreshold(orgImg);
+			  	CvMemStorage mem = CvMemStorage.create();
+			  	CvSeq contours = new CvSeq(orgImg);
+
+			    contours = cvCreateSeq(0, sizeof(CvContour.class),
+				sizeof(CvSeq.class), mem);
+
+				cvFindContours(thresholdImage.clone(), mem, contours,
+				Loader.sizeof(CvContour.class), CV_RETR_CCOMP,
+				CV_CHAIN_APPROX_SIMPLE, cvPoint(0, 0));
+		        
+		        while (contours != null && !contours.isNull()) {
+					divider++;
+					System.out.println(divider);
+		        	// define a 2D rectangle structure that will be the bounding box of the contour of the object
+					CvRect br = cvBoundingRect(contours, 1);
+					// draw a GREEN rectangle around the contour (of the object detected)
+					cvRectangle(orgImg, cvPoint(br.x(), br.y()),
+					cvPoint(br.x() + br.width(), br.y() + br.height()),
+					CvScalar.GREEN, 3, CV_AA, 0);
+				
+					if(divider%2==0) 
+					{
+						result = result - br.x();
+		        		if(result > 0)
+		        		{
+		            		clockViewCard.displayedTime.add(Calendar.HOUR_OF_DAY, 3);
+							System.out.println("add 3");
+							break outerloop;
+		        		}
+	
+				        else if(result < 0)
+		        		{
+		            		clockViewCard.displayedTime.add(Calendar.HOUR_OF_DAY, -3);
+							System.out.println("minus 3");
+							result = 0;
+							break outerloop;
+		        		}
+						//else if(result ==0) System.out.println("Nothing");
+					}
+					else result = br.x();
+					cvWaitKey(2);
+		            // do all of the above for the next contour
+					contours = contours.h_next();
+				}  		
+				 // show the detected 'coloured' objects with rectangles drawn on on the initially captured image        
+				 //canvasW.showImage(orgImg);  			
+			  }
+		grabber.stop();
+		//canvasW.dispose();
+     	clockViewCard.repaint();	      
+	}
+
+
+	//Taken from OpenCV sameple code
+	static IplImage hsvThreshold(IplImage orgImg) {
+		// 8-bit, 3- color =(RGB)
+		IplImage imgHSV = cvCreateImage(cvGetSize(orgImg), 8, 3);
+
+		cvCvtColor(orgImg, imgHSV, CV_BGR2HSV);
+		// 8-bit 1- color = monochrome
+		IplImage imgThreshold = cvCreateImage(cvGetSize(orgImg), 8, 1);
+		// cvScalar : ( H , S , V, A)
+		cvInRangeS(imgHSV, cvScalar(hueLowerR, 100, 100, 0),
+				cvScalar(hueUpperR, 255, 255, 0), imgThreshold);
+		cvReleaseImage(imgHSV);
+		// filter the thresholded image to smooth things
+		cvSmooth(imgThreshold, imgThreshold, CV_MEDIAN, 13);
+		// return the processed image
+		return imgThreshold;
+	}
+
+	//Taken from OpenCV sameple code
+	static Dimension getCoordinates(IplImage thresholdImage) {
+		int posX = 0;
+		int posY = 0;
+		CvMoments moments = new CvMoments();
+		cvMoments(thresholdImage, moments, 1);
+		// cv Spatial moment : Mji=sumx,y(I(x,y)â€¢xjâ€¢yi)
+		// where I(x,y) is the intensity of the pixel (x, y).
+		double momX10 = cvGetSpatialMoment(moments, 1, 0); // (x,y)
+		double momY01 = cvGetSpatialMoment(moments, 0, 1);// (x,y)
+		double area = cvGetCentralMoment(moments, 0, 0);
+		posX = (int) (momX10 / area);
+		posY = (int) (momY01 / area);
+		return new Dimension(posX, posY);
+	}	
 }
+
