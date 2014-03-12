@@ -69,6 +69,7 @@ public class View {
     }
 
     static MyJPanel cards; //the parent panel, uses CardLayout
+    static MyDrawingPanel clockViewCard;
 
     final static String MAINPANEL = "Main View";
     final static String CLOCKPANEL = "Clock View";
@@ -86,8 +87,6 @@ public class View {
     Boolean isRaining;
     static Calendar currentDate;
 
-    static MyDrawingPanel clockViewCard;
-
     static NephosAPI weather;
 
     public View(NephosAPI w) {
@@ -97,7 +96,7 @@ public class View {
             // font = fontBase.deriveFont(Font.PLAIN, 30);
             GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment();
             genv.registerFont(fontBase);
-            System.out.println("font loaded");
+            // System.out.println("font loaded");
         } catch (Exception ex) {
             ex.printStackTrace();
             System.err.println("font not loaded.");
@@ -105,14 +104,14 @@ public class View {
         currentDate = Calendar.getInstance();
         weather = w;
         isBig = false;
-        System.out.println(isBig);
+        // System.out.println(isBig);
     }
 
     private static String getTempAtDay(int day)
     {
         if(isBig)
         {
-            return "from " + weather.getMinTemperatureAtDay(day) + " to " + weather.getMaxTemperatureAtDay(day);
+            return ": " + weather.getMinTemperatureAtDay(day) + " to " + weather.getMaxTemperatureAtDay(day);
         }
         else
         {
@@ -223,8 +222,10 @@ public class View {
         //the main view
         MyJPanel mainViewCard = new MyJPanel();
         mainViewCard.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e){
+            public void mouseClicked(MouseEvent e){
                 CardLayout cl = (CardLayout)(cards.getLayout());
+                clockViewCard.displayedTime = clockViewCard.currentTime;
+                clockViewCard.last = null;
                 cl.show(cards, CLOCKPANEL);
                 clockViewCard.mouseDragged(e);
             }
@@ -236,7 +237,6 @@ public class View {
                 calendarButton.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
                         CardLayout cl = (CardLayout)(cards.getLayout());
-                        // calendarViewCard.displayedTime = Calendar.getInstance();
                         cl.show(cards, CALENDARPANEL);
                     }
                 });
@@ -287,27 +287,7 @@ public class View {
 
 
         //the clock
-        clockViewCard = new MyDrawingPanel(new Dimension(320, 470));
-        if(isBig) clockViewCard = new MyDrawingPanel(new Dimension(1024, 780));
-        clockViewCard.addMouseListener(new MouseAdapter() {
-            public void mouseReleased(MouseEvent e){
-                CardLayout cl = (CardLayout)(cards.getLayout());
-                cl.show(cards, MAINPANEL);
-            }
-        });
-        clockViewCard.setLayout(new BoxLayout(clockViewCard, BoxLayout.Y_AXIS));
-        MyJPanel clockViewCardNavigation = new MyJPanel();
-        clockViewCardNavigation.setLayout(new BoxLayout(clockViewCardNavigation, BoxLayout.X_AXIS));
-            JButton clockBackButton = createImageButton(audioOn);
-            clockBackButton.addMouseListener(new MouseAdapter() {
-                    public void mouseClicked(MouseEvent e) {
-
-                    }
-                });
-        clockViewCardNavigation.add(Box.createHorizontalGlue());
-        clockViewCardNavigation.add(clockBackButton);
-        // SimpleDateFormat timeFormat = new SimpleDateFormat("EEEE dd/MM hh:mm");
-        // MyJLabel timeText = createLabelWithSize(timeFormat.format(clockViewCard.displayedTime.getTime()), mediumText);
+        //first we create the labels so we can send them to them drawing panel
         MyJLabel clockText1 = createTransparentLabelWithSize(
             "<html>" +
                 "<center style=\"font-color: rgba(255,0,0,0.3);\">" + 
@@ -330,6 +310,24 @@ public class View {
                     "<b>take an umbrella</b>!" + 
                 "</center>"+ 
             "</html>", mediumText);
+        clockViewCard = new MyDrawingPanel(isBig, fontBase, mediumText, clockText2, weather);
+        clockViewCard.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e){
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards, MAINPANEL);
+            }
+        });
+        clockViewCard.setLayout(new BoxLayout(clockViewCard, BoxLayout.Y_AXIS));
+        MyJPanel clockViewCardNavigation = new MyJPanel();
+        clockViewCardNavigation.setLayout(new BoxLayout(clockViewCardNavigation, BoxLayout.X_AXIS));
+            JButton clockBackButton = createImageButton(audioOn);
+            clockBackButton.addMouseListener(new MouseAdapter() {
+                    public void mouseClicked(MouseEvent e) {
+
+                    }
+                });
+        clockViewCardNavigation.add(Box.createHorizontalGlue());
+        clockViewCardNavigation.add(clockBackButton);
         clockViewCard.add(clockViewCardNavigation);
         // clockViewCard.add(Box.createVerticalGlue());
         // timeText.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -562,16 +560,6 @@ public class View {
         pane.add(cards, BorderLayout.CENTER);
     }
      
-    // public void itemStateChanged(ItemEvent evt) {
-    //     CardLayout cl = (CardLayout)(cards.getLayout());
-    //     cl.show(cards, (String)evt.getItem());
-    // }
-     
-    /**
-     * Create the GUI and show it.  For thread safety,
-     * this method should be invoked from the
-     * event dispatch thread.
-     */
     public void createAndShowGUI() {
         //Create and set up the window.
         frame = new JFrame("Nephos Weather");

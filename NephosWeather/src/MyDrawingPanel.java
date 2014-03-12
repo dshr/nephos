@@ -15,34 +15,80 @@ public class MyDrawingPanel extends JPanel implements MouseMotionListener {
     static Dimension panelSize;
     static int circleSize;
     public static Calendar displayedTime;
-    static Calendar currentTime;
+    public static Calendar currentTime;
 
     public static Point center;
     public static Point last;
 
-    public MyDrawingPanel(Dimension size) {
+    static Font fontBase;
+    static int textSize;
+
+    static MyJLabel tempText;
+
+    Boolean isBig;
+    NephosAPI weather;
+
+    private void printSimpleString(String s, int width, int XPos, int YPos, Graphics2D g2){  
+            int stringLen = (int) g2.getFontMetrics().getStringBounds(s, g2).getWidth();  
+            int start = width/2 - stringLen/2;  
+            g2.drawString(s, start + XPos, YPos);  
+    } 
+
+    // private int calculateDaysDiff(Calendar date1, Calendar date2){
+    //     SimpleDateFormat formatter= new SimpleDateFormat("MM/dd/yyyy");
+    //     String truncatedDateString1 = formatter.format(date1);
+    //     Date truncatedDate1 = formatter.parse(truncatedDateString1);
+
+    //     String truncatedDateString2 = formatter.format(date2);
+    //     Date truncatedDate2 = formatter.parse(truncatedDateString2);
+
+    //     long timeDifference = truncatedDate2.getTime()- truncatedDate1.getTime();
+
+    //     int daysInBetween = timeDifference / (24*60*60*1000);
+
+    //     return daysInBetween;
+    // }
+
+    private int calculateHoursDiff(Calendar date1, Calendar date2){
+        int diff=(int)((date1.getTimeInMillis() - date2.getTimeInMillis())/(60*60 * 1000));
+        return diff;
+    }
+
+    public MyDrawingPanel(Boolean _isBig, Font f, int _textSize, MyJLabel _tempText, NephosAPI _weather) {
         super();
         setFocusable(true);
-        panelSize = size;
-        // System.out.println("" + size.width + " " + size.height);
-        if(size.width > size.height)
+        isBig = _isBig;
+        tempText = _tempText;
+        weather = _weather;
+        if(isBig)
         {
-            circleSize = (int)(0.8 * size.height);
+            panelSize = new Dimension(1024, 800);
         }
         else
         {
-            circleSize = (int)(0.8 * size.width);
+            panelSize = new Dimension(320, 480);
+        }
+        if(panelSize.width > panelSize.height)
+        {
+            circleSize = (int)(0.7 * panelSize.height);
+        }
+        else
+        {
+            circleSize = (int)(0.8 * panelSize.width);
         }
         // System.out.println(circleSize);
         setBackground(Color.WHITE);
         currentTime = Calendar.getInstance();
         displayedTime = Calendar.getInstance();
         last = new Point();
-        int centerPointHeight = (int)((panelSize.height/2) * 1.01);
+        int centerPointHeight = (int)((panelSize.height/2) * 1.05);
         center = new Point(panelSize.width/2, centerPointHeight);
+        fontBase = f;
+        textSize = _textSize;
     }
 
     public void paintChildren(Graphics g) {
+        currentTime = Calendar.getInstance();
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         super.paintChildren(g);
@@ -77,6 +123,14 @@ public class MyDrawingPanel extends JPanel implements MouseMotionListener {
         // fill in the circle
         g2.fill(currentTimeCircle);
         g2.draw(currentTimeCircle);
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("EEEE dd/MM HH:mm");
+        g.setFont(fontBase.deriveFont(Font.PLAIN, textSize));
+        String date = new String(timeFormat.format(displayedTime.getTime()));
+        int yPos = (int) (panelSize.height*0.18);
+        if(isBig) yPos = (int) (panelSize.height*0.1); 
+        printSimpleString(date, panelSize.width, 0, yPos, g2);
+
     }
 
     public double CrossProduct(Vector2d v1, Vector2d v2)
@@ -99,19 +153,35 @@ public class MyDrawingPanel extends JPanel implements MouseMotionListener {
             Vector2d currentVector = new Vector2d(center.x - current.x, center.y - current.y);
             Vector2d lastVector = new Vector2d(center.x - last.x, center.y - last.y);
             double angle = CrossProduct(lastVector, currentVector);
+            int delta = 0;
 
-            if(angle > 1)
+            int timeDifference = calculateHoursDiff(displayedTime, currentTime);
+            if((timeDifference > 48)||(timeDifference < 0))
             {
-                displayedTime.add(Calendar.HOUR_OF_DAY, 1);
-                last = current;
+                delta = 0;
             }
-            if(angle < -1)
+            else
             {
-                displayedTime.add(Calendar.HOUR_OF_DAY, -1);
-                last = current;
+                if(angle > 400)
+                {
+                    delta = 1;
+                    if(timeDifference == 48) delta = 0;
+                    last = current;
+                }
+                if(angle < -400)
+                {
+                    delta = -1;
+                    if(timeDifference == 0) delta = 0;
+                    last = current;
+                }
+                String newText = "<html>" +
+                    "<center>" + 
+                        "<span style=\"font-weight:bold;\">" + Integer.toString(weather.getTemperatureAtHour(timeDifference)) + (char)186 + "C</span>" +
+                    "</center>"+ 
+                "</html>";
+                tempText.setText(newText);
             }
-
-
+            displayedTime.add(Calendar.HOUR_OF_DAY, delta);
             repaint();
         }
     }
