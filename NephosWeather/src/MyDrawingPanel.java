@@ -38,7 +38,8 @@ public class MyDrawingPanel extends JPanel implements MouseMotionListener {
         currentTime = Calendar.getInstance();
         displayedTime = Calendar.getInstance();
         last = new Point();
-        center = new Point(panelSize.width/2, panelSize.height/2);
+        int centerPointHeight = (int)((panelSize.height/2) * 1.01);
+        center = new Point(panelSize.width/2, centerPointHeight);
     }
 
     public void paintChildren(Graphics g) {
@@ -46,7 +47,7 @@ public class MyDrawingPanel extends JPanel implements MouseMotionListener {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         super.paintChildren(g);
         //draw big circle
-        Ellipse2D circle = new Ellipse2D.Double(panelSize.width/2-(circleSize/2), panelSize.height/2-(circleSize/2), circleSize, circleSize);
+        Ellipse2D circle = new Ellipse2D.Double(center.x-(circleSize/2), center.y-(circleSize/2), circleSize, circleSize);
         g2.setColor(new Color(0.0f,0.0f,0.0f, 1.0f));
         g2.setStroke(new BasicStroke(5f));
         g2.draw(circle);
@@ -55,8 +56,8 @@ public class MyDrawingPanel extends JPanel implements MouseMotionListener {
         double angleInDegrees = -(displayedTime.get(Calendar.HOUR_OF_DAY)*60 + displayedTime.get(Calendar.MINUTE))/4;
         double angle = Math.toRadians(angleInDegrees);
 
-        int displayedTimeCircleX = (int)(panelSize.width/2-((circleSize/2)*Math.sin(angle))) - displayedTimeCircleSize/2;
-        int displayedTimeCircleY = (int)(panelSize.height/2-((circleSize/2)*Math.cos(angle))) - displayedTimeCircleSize/2;
+        int displayedTimeCircleX = (int)(center.x-((circleSize/2)*Math.sin(angle))) - displayedTimeCircleSize/2;
+        int displayedTimeCircleY = (int)(center.y-((circleSize/2)*Math.cos(angle))) - displayedTimeCircleSize/2;
 
         Ellipse2D displayedTimeCircle = new Ellipse2D.Double(displayedTimeCircleX, displayedTimeCircleY, displayedTimeCircleSize, displayedTimeCircleSize);
         g.setColor(new Color(0.0f,0.0f,0.0f, 1.0f));
@@ -68,8 +69,8 @@ public class MyDrawingPanel extends JPanel implements MouseMotionListener {
         angleInDegrees = -(currentTime.get(Calendar.HOUR_OF_DAY)*60 + currentTime.get(Calendar.MINUTE))/4;
         angle = Math.toRadians(angleInDegrees);
 
-        int currentTimeCircleX = (int)(panelSize.width/2-((circleSize/2)*Math.sin(angle))) - currentTimeCircleSize/2;
-        int currentTimeCircleY = (int)(panelSize.height/2-((circleSize/2)*Math.cos(angle))) - currentTimeCircleSize/2;
+        int currentTimeCircleX = (int)(center.x-((circleSize/2)*Math.sin(angle))) - currentTimeCircleSize/2;
+        int currentTimeCircleY = (int)(center.y-((circleSize/2)*Math.cos(angle))) - currentTimeCircleSize/2;
 
         Ellipse2D currentTimeCircle = new Ellipse2D.Double(currentTimeCircleX, currentTimeCircleY, currentTimeCircleSize, currentTimeCircleSize);
         g.setColor(new Color(0.0f,0.0f,0.0f, 1.0f));

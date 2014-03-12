@@ -112,7 +112,7 @@ public class View {
     {
         if(isBig)
         {
-            return "min: " + weather.getMinTemperatureAtDay(day) + (char)186 + "C " + " max: " + weather.getMaxTemperatureAtDay(day);
+            return "from " + weather.getMinTemperatureAtDay(day) + " to " + weather.getMaxTemperatureAtDay(day);
         }
         else
         {
@@ -207,11 +207,15 @@ public class View {
         ImageIcon cal = createImageIcon("resources/images/calendar_32.png", "small cal");
         ImageIcon settings = createImageIcon("resources/images/cog_32.png", "small cog");
         ImageIcon arrow = createImageIcon("resources/images/arrow_32.png", "small arrow");
+        ImageIcon audioOn = createImageIcon("resources/images/audio_on_32.png", "small audio on");
+        ImageIcon audioOff = createImageIcon("resources/images/audio_off_32.png", "small audio off");
         if(isBig)
         {
             cal = createImageIcon("resources/images/calendar_64.png", "big cal");
             settings = createImageIcon("resources/images/cog_64.png", "big cog");
             arrow = createImageIcon("resources/images/arrow_64.png", "big arrow");
+            audioOn = createImageIcon("resources/images/audio_on_64.png", "big audio on");
+            audioOff = createImageIcon("resources/images/audio_off_64.png", "big audio off");
         }
          
         //===========Create the "cards".==================
@@ -283,8 +287,8 @@ public class View {
 
 
         //the clock
-        clockViewCard = new MyDrawingPanel(new Dimension(320, 420));
-        if(isBig) clockViewCard = new MyDrawingPanel(new Dimension(1024, 726));
+        clockViewCard = new MyDrawingPanel(new Dimension(320, 470));
+        if(isBig) clockViewCard = new MyDrawingPanel(new Dimension(1024, 780));
         clockViewCard.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e){
                 CardLayout cl = (CardLayout)(cards.getLayout());
@@ -292,8 +296,18 @@ public class View {
             }
         });
         clockViewCard.setLayout(new BoxLayout(clockViewCard, BoxLayout.Y_AXIS));
-        SimpleDateFormat timeFormat = new SimpleDateFormat("EEEE dd/MM hh:mm");
-        MyJLabel timeText = createLabelWithSize(timeFormat.format(clockViewCard.displayedTime.getTime()), mediumText);
+        MyJPanel clockViewCardNavigation = new MyJPanel();
+        clockViewCardNavigation.setLayout(new BoxLayout(clockViewCardNavigation, BoxLayout.X_AXIS));
+            JButton clockBackButton = createImageButton(audioOn);
+            clockBackButton.addMouseListener(new MouseAdapter() {
+                    public void mouseClicked(MouseEvent e) {
+
+                    }
+                });
+        clockViewCardNavigation.add(Box.createHorizontalGlue());
+        clockViewCardNavigation.add(clockBackButton);
+        // SimpleDateFormat timeFormat = new SimpleDateFormat("EEEE dd/MM hh:mm");
+        // MyJLabel timeText = createLabelWithSize(timeFormat.format(clockViewCard.displayedTime.getTime()), mediumText);
         MyJLabel clockText1 = createTransparentLabelWithSize(
             "<html>" +
                 "<center style=\"font-color: rgba(255,0,0,0.3);\">" + 
@@ -316,9 +330,10 @@ public class View {
                     "<b>take an umbrella</b>!" + 
                 "</center>"+ 
             "</html>", mediumText);
-        clockViewCard.add(Box.createVerticalGlue());
-        timeText.setAlignmentX(Component.CENTER_ALIGNMENT);
-        clockViewCard.add(timeText);
+        clockViewCard.add(clockViewCardNavigation);
+        // clockViewCard.add(Box.createVerticalGlue());
+        // timeText.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // clockViewCard.add(timeText);
         clockViewCard.add(Box.createVerticalGlue());
         clockText1.setAlignmentX(Component.CENTER_ALIGNMENT);
         clockViewCard.add(clockText1);
