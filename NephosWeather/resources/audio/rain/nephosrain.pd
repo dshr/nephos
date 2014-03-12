@@ -1,0 +1,12 @@
+#N canvas 594 460 450 300 10;
+#X obj 161 57 rainwindow;
+#X obj 231 58 windywindow;
+#X obj 116 57 rain1;
+#X obj 70 20 inlet;
+#X obj 179 149 dac~;
+#X connect 0 0 4 0;
+#X connect 0 0 4 1;
+#X connect 1 0 4 0;
+#X connect 1 0 4 1;
+#X connect 2 0 4 0;
+#X connect 2 0 4 1;

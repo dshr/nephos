@@ -1,0 +1,17 @@
+#N canvas 0 22 1680 941 10;
+#X obj 59 160 catch~ rain;
+#X obj 59 55 throw~ rain;
+#X obj 59 98 throw~ rain;
+#X obj 59 140 throw~ rain;
+#X obj 59 202 hip~ 900;
+#X obj 59 181 *~ 0.05;
+#X obj 2 225 outlet~;
+#X obj 59 33 cpraingen 50 12 0.15;
+#X obj 59 75 cpraingen 60 12 0.2;
+#X obj 59 117 cpraingen 70 12 0.4;
+#X connect 0 0 5 0;
+#X connect 4 0 6 0;
+#X connect 5 0 4 0;
+#X connect 7 0 1 0;
+#X connect 8 0 2 0;
+#X connect 9 0 3 0;

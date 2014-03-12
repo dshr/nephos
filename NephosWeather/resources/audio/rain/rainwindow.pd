@@ -1,0 +1,11 @@
+#N canvas 438 189 414 128 10;
+#X obj -14 -141 raindrops 70 0.2;
+#X obj -14 -74 glasswindow 2007 1994 1986 1969 254 669 443 551 3.7
+4.2 0.61 2.3;
+#X obj -14 -118 hip~ 8000;
+#X obj -14 -96 *~ 2;
+#X obj -14 -36 outlet~;
+#X connect 0 0 2 0;
+#X connect 1 0 4 0;
+#X connect 2 0 3 0;
+#X connect 3 0 1 0;
