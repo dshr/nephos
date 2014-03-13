@@ -114,6 +114,7 @@ public class View {
     static Calendar currentDate;
 
     static NephosAPI weather;
+    static String rainmessage = " ";
 	
 	static int count = 1;
 
@@ -145,6 +146,28 @@ public class View {
         {
             return "" + weather.getTemperatureAtDay(day);
         }
+    }
+
+    private static String howBadItIs(int temp){
+        if((temp<10)&&(temp>-5)) return " merely";
+        if((temp >= 10)||(temp<= -5)) return " exactly";
+        if((temp>24)||(temp< -10)) return " the whopping";
+        else return " ";
+    }
+
+    private static String isItRaining(){
+        //rainmessage = "And it's <b>not raining<b/>!<br>"+"Time to enjoy London!";
+        if (weather.getCurrentSummary().equals("clear")){
+            rainmessage = "Don't forget to<br>enjoy the nice weather!<br>Have fun!";
+        }
+        if ((weather.getCurrentSummary().equals("partly cloudy")||weather.getCurrentSummary().equals("mostly cloudy")) && weather.getCurrentPrecipProbability()<0.1){
+            rainmessage = "At least<br>it's not raining!<br>Have fun!";
+        }
+
+        if (weather.getCurrentIcon().equals("rain")){
+            rainmessage = "And it's also <b>raining</b>,<br>so don't forget to<br><b>take an umbrella</b>!";
+        }
+        return rainmessage;
     }
 
     private static JButton createSimpleButton(String text, int size) { // a method to create flat buttons
@@ -255,8 +278,8 @@ public class View {
                 clockViewCard.displayedTime = clockViewCard.currentTime;
                 clockViewCard.last = null;
                 cl.show(cards, CLOCKPANEL);
+                isClock = true;
                 clockViewCard.mouseDragged(e);
-				isClock = true;
             }
         });
         mainViewCard.setLayout(new BoxLayout(mainViewCard, BoxLayout.Y_AXIS));
@@ -284,8 +307,8 @@ public class View {
             "<html>" +
                 "<center>" + 
                     "Well hello there!<br>" + 
-                    "It's <b>cold and windy</b><br>" + 
-                    "today at merely" + 
+                    "It's <b>" + weather.getCurrentSummary()+"</b><br>" + 
+                    "today at" + howBadItIs(weather.getCurrentTemperature()) +
                 "</center>"+ 
             "</html>", mediumText);
         MyJLabel mainText2 = createLabelWithSize(
@@ -296,10 +319,7 @@ public class View {
             "</html>", hugeText);
         MyJLabel mainText3 = createLabelWithSize(
             "<html>" +
-                "<center>" + 
-                    "And it's also <b>raining</b>,<br>" + 
-                    "so don't forget to<br>" + 
-                    "<b>take an umbrella</b>!" + 
+                "<center>" + isItRaining() +
                 "</center>"+ 
             "</html>", mediumText);
         mainViewCard.add(mainViewCardNavigation);

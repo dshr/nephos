@@ -35,21 +35,6 @@ public class MyDrawingPanel extends JPanel implements MouseMotionListener{
             g2.drawString(s, start + XPos, YPos);  
     } 
 
-    // private int calculateDaysDiff(Calendar date1, Calendar date2){
-    //     SimpleDateFormat formatter= new SimpleDateFormat("MM/dd/yyyy");
-    //     String truncatedDateString1 = formatter.format(date1);
-    //     Date truncatedDate1 = formatter.parse(truncatedDateString1);
-
-    //     String truncatedDateString2 = formatter.format(date2);
-    //     Date truncatedDate2 = formatter.parse(truncatedDateString2);
-
-    //     long timeDifference = truncatedDate2.getTime()- truncatedDate1.getTime();
-
-    //     int daysInBetween = timeDifference / (24*60*60*1000);
-
-    //     return daysInBetween;
-    // }
-
     private int calculateHoursDiff(Calendar date1, Calendar date2){
         int diff=(int)((date1.getTimeInMillis() - date2.getTimeInMillis())/(60*60 * 1000));
         return diff;
@@ -86,7 +71,7 @@ public class MyDrawingPanel extends JPanel implements MouseMotionListener{
         center = new Point(panelSize.width/2, centerPointHeight);
         fontBase = f;
         textSize = _textSize;
-		View.isClock = true;
+		// View.isClock = true;
     }
 
     public void paintChildren(Graphics g) {

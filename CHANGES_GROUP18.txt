@@ -1,9 +1,0 @@
-Deviations:
-- The red object navigation (using OpenCV) was originally supposed to control the clock view (i.e: circling a red circle to check 
-  the 48 hours before or after the given time, instead of holding down the mouse). 
-  However, as OpenCV was sorted very late, we were unable to fully implement this.
-- There is no sound output at all since the actual implementation of libpd, the library that we were going to use for sound was left 
-  until late and did not go the way we expected, giving strange undebuggable errors. The actual implementation of the library into the
-  project got delayed because we spent most of out time designing the PureData patches for the application and thought it would be easy 
-  to incoroporate libpd into Java based on out previous experience with it and iOS.
-- Most of the sound and location tracking functionality is not working, but our user interface stuck very close to the prototype we had.

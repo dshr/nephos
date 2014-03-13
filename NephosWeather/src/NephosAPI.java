@@ -1,6 +1,7 @@
 // package nephos;
 import dme.forecastiolib.*;
 import com.eclipsesource.json.*;
+import java.text.*;
 
 public class NephosAPI{
 	
@@ -34,12 +35,19 @@ public class NephosAPI{
 
 		currentConditions = new FIOCurrently(nephosForecast);
 		currentSummary = currentConditions.get().getByKey("summary");
+		String[] summaryParts = currentSummary.split("\"");
+		currentSummary = summaryParts[1].toLowerCase();
 		currentIcon = currentConditions.get().getByKey("icon");
+		String[] iconParts = currentIcon.split("\"");
+		currentIcon = iconParts[1].toLowerCase();
+		
+		System.out.println(currentIcon);
 		currentTemperature = (int)(Double.parseDouble(currentConditions.get().getByKey("temperature")));
 		currentApparentTemperature = (int)(Double.parseDouble(currentConditions.get().getByKey("apparentTemperature")));
 		currentPrecipProbability = Double.parseDouble(currentConditions.get().getByKey("precipProbability"));
 		currentPrecipIntensity = Double.parseDouble(currentConditions.get().getByKey("precipIntensity"));
 		currentCloudCover = Double.parseDouble(currentConditions.get().getByKey("cloudCover"));
+		System.out.println(currentCloudCover);
 		currentWindSpeed = Double.parseDouble(currentConditions.get().getByKey("windSpeed"));
 		currentHumidity = Double.parseDouble(currentConditions.get().getByKey("humidity"));
 
@@ -63,11 +71,11 @@ public class NephosAPI{
 		return currentApparentTemperature;
 	}
 
-	public double getPrecipProbability(){
+	public double getCurrentPrecipProbability(){
 		return currentPrecipProbability;
 	}
 
-	public double getPrecipIntensity(){
+	public double getCurrentPrecipIntensity(){
 		return currentPrecipIntensity;
 	}
 
